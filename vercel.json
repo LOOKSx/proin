@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "name": "proin",
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://proim.vercel.app/api/$1"
+    },
+    {
+      "source": "/live",
+      "destination": "/index-live.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

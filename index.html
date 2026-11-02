@@ -1,0 +1,173 @@
+﻿<!doctype html>
+<html lang="en" data-beasties-container>
+  <head>
+    <meta charset="utf-8">
+    <title>ProIM</title>
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#6366f1">
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
+    <link rel="apple-touch-icon" href="logo.jpg">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600;700&amp;family=Fira+Code:wght@400;500;600;700&amp;family=Kanit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Mitr', 'Kanit', 'sans-serif'],
+              mono: ['Fira Code', 'monospace'],
+            },
+            colors: {
+              brand: {
+                accent: {
+                  DEFAULT: 'var(--color-brand-accent, #6366f1)',
+                  teal: 'var(--color-brand-accent-teal, #0ea5e9)',
+                  'teal-dim': 'var(--color-brand-accent-teal-dim, rgba(14, 165, 233, 0.1))',
+                  'indigo-dim': 'var(--color-brand-accent-indigo-dim, rgba(99, 102, 241, 0.1))',
+                },
+              },
+            },
+            boxShadow: {
+              'glow-teal': 'var(--shadow-glow-teal, 0 0 20px rgba(14, 165, 233, 0.15))',
+              'glow-indigo': 'var(--shadow-glow-indigo, 0 0 20px rgba(99, 102, 241, 0.15))',
+              glass: '0 8px 32px 0 rgba(31, 38, 135, 0.05)',
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      /* Force regular Mitr font weight globally across all tags and Tailwind helpers */
+      .font-black,
+      .font-extrabold,
+      .font-bold,
+      .font-semibold,
+      .font-medium,
+      .font-normal {
+        font-weight: 400 !important;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6,
+      th,
+      td,
+      button,
+      select,
+      input,
+      textarea,
+      label,
+      span,
+      p,
+      a,
+      div {
+        font-weight: 400 !important;
+      }
+    </style>
+  <style>:root{--swal2-outline:0 0 0 3px rgba(100, 150, 200, .5);--swal2-container-padding:.625em;--swal2-backdrop:rgba(0, 0, 0, .4);--swal2-backdrop-transition:background-color .15s;--swal2-width:32em;--swal2-padding:0 0 1.25em;--swal2-border:none;--swal2-border-radius:.3125rem;--swal2-background:white;--swal2-color:#545454;--swal2-show-animation:swal2-show .3s;--swal2-hide-animation:swal2-hide .15s forwards;--swal2-icon-zoom:1;--swal2-title-padding:.8em 1em 0;--swal2-html-container-padding:1em 1.6em .3em;--swal2-input-border:1px solid #d9d9d9;--swal2-input-border-radius:.1875em;--swal2-input-box-shadow:inset 0 1px 1px rgba(0, 0, 0, .06), 0 0 0 3px transparent;--swal2-input-background:transparent;--swal2-input-transition:border-color .2s, box-shadow .2s;--swal2-input-hover-box-shadow:inset 0 1px 1px rgba(0, 0, 0, .06), 0 0 0 3px transparent;--swal2-input-focus-border:1px solid #b4dbed;--swal2-input-focus-box-shadow:inset 0 1px 1px rgba(0, 0, 0, .06), 0 0 0 3px rgba(100, 150, 200, .5);--swal2-progress-step-background:#add8e6;--swal2-validation-message-background:#f0f0f0;--swal2-validation-message-color:#666;--swal2-footer-border-color:#eee;--swal2-footer-background:transparent;--swal2-footer-color:inherit;--swal2-timer-progress-bar-background:rgba(0, 0, 0, .3);--swal2-close-button-position:initial;--swal2-close-button-inset:auto;--swal2-close-button-font-size:2.5em;--swal2-close-button-color:#ccc;--swal2-close-button-transition:color .2s, box-shadow .2s;--swal2-close-button-outline:initial;--swal2-close-button-box-shadow:inset 0 0 0 3px transparent;--swal2-close-button-focus-box-shadow:inset var(--swal2-outline);--swal2-close-button-hover-transform:none;--swal2-actions-justify-content:center;--swal2-actions-width:auto;--swal2-actions-margin:1.25em auto 0;--swal2-actions-padding:0;--swal2-actions-border-radius:0;--swal2-actions-background:transparent;--swal2-action-button-transition:background-color .2s, box-shadow .2s;--swal2-action-button-hover:black 10%;--swal2-action-button-active:black 10%;--swal2-confirm-button-box-shadow:none;--swal2-confirm-button-border-radius:.25em;--swal2-confirm-button-background-color:#7066e0;--swal2-confirm-button-color:#fff;--swal2-deny-button-box-shadow:none;--swal2-deny-button-border-radius:.25em;--swal2-deny-button-background-color:#dc3741;--swal2-deny-button-color:#fff;--swal2-cancel-button-box-shadow:none;--swal2-cancel-button-border-radius:.25em;--swal2-cancel-button-background-color:#6e7881;--swal2-cancel-button-color:#fff;--swal2-toast-show-animation:swal2-toast-show .5s;--swal2-toast-hide-animation:swal2-toast-hide .1s forwards;--swal2-toast-border:none;--swal2-toast-box-shadow:0 0 1px hsl(0deg 0% 0% / .075), 0 1px 2px hsl(0deg 0% 0% / .075), 1px 2px 4px hsl(0deg 0% 0% / .075), 1px 3px 8px hsl(0deg 0% 0% / .075), 2px 4px 16px hsl(0deg 0% 0% / .075)}div:where(.swal2-container){display:grid;position:fixed;z-index:1060;inset:0;box-sizing:border-box;grid-template-areas:"top-start     top            top-end" "center-start  center         center-end" "bottom-start  bottom-center  bottom-end";grid-template-rows:minmax(min-content,auto) minmax(min-content,auto) minmax(min-content,auto);height:100%;padding:var(--swal2-container-padding);overflow-x:hidden;transition:var(--swal2-backdrop-transition);-webkit-overflow-scrolling:touch}div:where(.swal2-container) div:where(.swal2-popup){display:none;position:relative;box-sizing:border-box;grid-template-columns:minmax(0,100%);width:var(--swal2-width);max-width:100%;padding:var(--swal2-padding);border:var(--swal2-border);border-radius:var(--swal2-border-radius);background:var(--swal2-background);color:var(--swal2-color);font-family:inherit;font-size:1rem}div:where(.swal2-container) div:where(.swal2-popup):focus{outline:none}div:where(.swal2-container) div:where(.swal2-popup).swal2-draggable div:where(.swal2-icon){cursor:grab}div:where(.swal2-container) div:where(.swal2-popup).swal2-dragging div:where(.swal2-icon){cursor:grabbing}div:where(.swal2-container) h2:where(.swal2-title){position:relative;max-width:100%;margin:0;padding:var(--swal2-title-padding);color:inherit;font-size:1.875em;font-weight:600;text-align:center;text-transform:none;overflow-wrap:break-word;cursor:initial}div:where(.swal2-container) div:where(.swal2-actions){display:flex;z-index:1;box-sizing:border-box;flex-wrap:wrap;align-items:center;justify-content:var(--swal2-actions-justify-content);width:var(--swal2-actions-width);margin:var(--swal2-actions-margin);padding:var(--swal2-actions-padding);border-radius:var(--swal2-actions-border-radius);background:var(--swal2-actions-background)}div:where(.swal2-container) div:where(.swal2-loader){display:none;align-items:center;justify-content:center;width:2.2em;height:2.2em;margin:0 1.875em;animation:swal2-rotate-loading 1.5s linear 0s infinite normal;border-width:.25em;border-style:solid;border-radius:100%;border-color:#2778c4 rgba(0,0,0,0) #2778c4 rgba(0,0,0,0)}div:where(.swal2-container) button:where(.swal2-styled){margin:.3125em;padding:.625em 1.1em;transition:var(--swal2-action-button-transition);border:none;box-shadow:0 0 0 3px #0000;font-weight:500}div:where(.swal2-container) button:where(.swal2-styled):not([disabled]){cursor:pointer}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm){border-radius:var(--swal2-confirm-button-border-radius);background:initial;background-color:var(--swal2-confirm-button-background-color);box-shadow:var(--swal2-confirm-button-box-shadow);color:var(--swal2-confirm-button-color);font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm):hover{background-color:color-mix(in srgb,var(--swal2-confirm-button-background-color),var(--swal2-action-button-hover))}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm):active{background-color:color-mix(in srgb,var(--swal2-confirm-button-background-color),var(--swal2-action-button-active))}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-deny){border-radius:var(--swal2-deny-button-border-radius);background:initial;background-color:var(--swal2-deny-button-background-color);box-shadow:var(--swal2-deny-button-box-shadow);color:var(--swal2-deny-button-color);font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-deny):hover{background-color:color-mix(in srgb,var(--swal2-deny-button-background-color),var(--swal2-action-button-hover))}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-deny):active{background-color:color-mix(in srgb,var(--swal2-deny-button-background-color),var(--swal2-action-button-active))}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel){border-radius:var(--swal2-cancel-button-border-radius);background:initial;background-color:var(--swal2-cancel-button-background-color);box-shadow:var(--swal2-cancel-button-box-shadow);color:var(--swal2-cancel-button-color);font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel):hover{background-color:color-mix(in srgb,var(--swal2-cancel-button-background-color),var(--swal2-action-button-hover))}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel):active{background-color:color-mix(in srgb,var(--swal2-cancel-button-background-color),var(--swal2-action-button-active))}div:where(.swal2-container) button:where(.swal2-styled):focus-visible{outline:none;box-shadow:var(--swal2-action-button-focus-box-shadow)}div:where(.swal2-container) button:where(.swal2-styled)[disabled]:not(.swal2-loading){opacity:.4}div:where(.swal2-container) button:where(.swal2-styled)::-moz-focus-inner{border:0}div:where(.swal2-container) div:where(.swal2-footer){margin:1em 0 0;padding:1em 1em 0;border-top:1px solid var(--swal2-footer-border-color);background:var(--swal2-footer-background);color:var(--swal2-footer-color);font-size:1em;text-align:center;cursor:initial}div:where(.swal2-container) div:where(.swal2-timer-progress-bar){width:100%;height:.25em;background:var(--swal2-timer-progress-bar-background)}div:where(.swal2-container) img:where(.swal2-image){max-width:100%;margin:2em auto 1em;cursor:initial}div:where(.swal2-container) button:where(.swal2-close){position:var(--swal2-close-button-position);inset:var(--swal2-close-button-inset);z-index:2;align-items:center;justify-content:center;width:1.2em;height:1.2em;margin-top:0;margin-right:0;margin-bottom:-1.2em;padding:0;overflow:hidden;transition:var(--swal2-close-button-transition);border:none;border-radius:var(--swal2-border-radius);outline:var(--swal2-close-button-outline);background:#0000;color:var(--swal2-close-button-color);font-family:monospace;font-size:var(--swal2-close-button-font-size);cursor:pointer;justify-self:end}div:where(.swal2-container) button:where(.swal2-close):hover{transform:var(--swal2-close-button-hover-transform);background:#0000;color:#f27474}div:where(.swal2-container) button:where(.swal2-close):focus-visible{outline:none;box-shadow:var(--swal2-close-button-focus-box-shadow)}div:where(.swal2-container) button:where(.swal2-close)::-moz-focus-inner{border:0}div:where(.swal2-container) div:where(.swal2-html-container){z-index:1;justify-content:center;margin:0;padding:var(--swal2-html-container-padding);overflow:auto;color:inherit;font-size:1.125em;font-weight:400;line-height:normal;text-align:center;overflow-wrap:break-word;word-break:break-word;cursor:initial}div:where(.swal2-container) input:where(.swal2-input),div:where(.swal2-container) input:where(.swal2-file),div:where(.swal2-container) textarea:where(.swal2-textarea),div:where(.swal2-container) select:where(.swal2-select),div:where(.swal2-container) div:where(.swal2-radio),div:where(.swal2-container) label:where(.swal2-checkbox){margin:1em 2em 3px}div:where(.swal2-container) input:where(.swal2-input),div:where(.swal2-container) input:where(.swal2-file),div:where(.swal2-container) textarea:where(.swal2-textarea){box-sizing:border-box;width:auto;transition:var(--swal2-input-transition);border:var(--swal2-input-border);border-radius:var(--swal2-input-border-radius);background:var(--swal2-input-background);box-shadow:var(--swal2-input-box-shadow);color:inherit;font-size:1.125em}div:where(.swal2-container) input:where(.swal2-input):hover,div:where(.swal2-container) input:where(.swal2-file):hover,div:where(.swal2-container) textarea:where(.swal2-textarea):hover{box-shadow:var(--swal2-input-hover-box-shadow)}div:where(.swal2-container) input:where(.swal2-input):focus,div:where(.swal2-container) input:where(.swal2-file):focus,div:where(.swal2-container) textarea:where(.swal2-textarea):focus{border:var(--swal2-input-focus-border);outline:none;box-shadow:var(--swal2-input-focus-box-shadow)}div:where(.swal2-container) input:where(.swal2-input)::placeholder,div:where(.swal2-container) input:where(.swal2-file)::placeholder,div:where(.swal2-container) textarea:where(.swal2-textarea)::placeholder{color:#ccc}div:where(.swal2-container) label:where(.swal2-input-label){display:flex;justify-content:center;margin:1em auto 0}div:where(.swal2-container) div:where(.swal2-validation-message){align-items:center;justify-content:center;margin:1em 0 0;padding:.625em;overflow:hidden;background:var(--swal2-validation-message-background);color:var(--swal2-validation-message-color);font-size:1em;font-weight:300}div:where(.swal2-container) div:where(.swal2-validation-message):before{content:"!";display:inline-block;width:1.5em;min-width:1.5em;height:1.5em;margin:0 .625em;border-radius:50%;background-color:#f27474;color:#fff;font-weight:600;line-height:1.5em;text-align:center}div:where(.swal2-icon){position:relative;box-sizing:content-box;justify-content:center;width:5em;height:5em;margin:2.5em auto .6em;zoom:var(--swal2-icon-zoom);border:.25em solid rgba(0,0,0,0);border-radius:50%;border-color:#000;font-family:inherit;line-height:5em;cursor:default;-webkit-user-select:none;user-select:none}@keyframes swal2-rotate-loading{0%{transform:rotate(0)}to{transform:rotate(360deg)}}*,:before,:after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / .5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }*,:before,:after{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}:before,:after{--tw-content:""}html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Fira Sans,Outfit,Kanit,sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0}.z-\[-1\]{z-index:-1}.h-80{height:20rem}.h-96{height:24rem}.w-80{width:20rem}.w-96{width:24rem}.overflow-hidden{overflow:hidden}.rounded-full{border-radius:9999px}.bg-indigo-300{--tw-bg-opacity:1;background-color:rgb(165 180 252 / var(--tw-bg-opacity, 1))}.bg-purple-300{--tw-bg-opacity:1;background-color:rgb(216 180 254 / var(--tw-bg-opacity, 1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-teal-300{--tw-bg-opacity:1;background-color:rgb(94 234 212 / var(--tw-bg-opacity, 1))}.font-sans{font-family:Fira Sans,Outfit,Kanit,sans-serif}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.opacity-30{opacity:.3}.mix-blend-multiply{mix-blend-mode:multiply}</style><link rel="stylesheet" href="styles-GW5BMILI.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="styles-GW5BMILI.css"></noscript></head>
+  <body class="bg-slate-50 text-slate-900 font-sans antialiased relative" style="font-family: 'Mitr', 'Kanit', sans-serif">
+    <!-- 3D Particle Scene Container (CSS Parallax + Canvas) -->
+    <div id="immersive-background" class="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-slate-50">
+      <!-- CSS Parallax Blobs -->
+      <div class="parallax-blob w-96 h-96 bg-indigo-300 rounded-full mix-blend-multiply opacity-30" style="top: -10%; left: -10%; animation: float 15s ease-in-out infinite"></div>
+      <div class="parallax-blob w-96 h-96 bg-teal-300 rounded-full mix-blend-multiply opacity-30" style="top: 40%; right: -10%; animation: float 20s ease-in-out infinite alternate"></div>
+      <div class="parallax-blob w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply opacity-30" style="bottom: -10%; left: 20%; animation: float 18s ease-in-out infinite"></div>
+
+      <!-- Three.js Canvas Container -->
+      <div id="three-canvas-container" class="absolute inset-0"></div>
+    </div>
+
+    <app-root></app-root>
+
+    <!-- Basic Three.js Particle Setup -->
+    <script>
+      // Only init Three.js if not on reduced motion
+      if (
+        window.matchMedia &&
+        !window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+        typeof THREE !== 'undefined'
+      ) {
+        const container = document.getElementById('three-canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(
+          75,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          1000,
+        );
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        // Create particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 300;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for (let i = 0; i < particlesCount * 3; i++) {
+          posArray[i] = (Math.random() - 0.5) * 10;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMaterial = new THREE.PointsMaterial({
+          size: 0.02,
+          color: 0x6366f1,
+          transparent: true,
+          opacity: 0.4,
+          blending: THREE.AdditiveBlending,
+        });
+
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+        camera.position.z = 3;
+
+        // Animation Loop
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
+
+        document.addEventListener('mousemove', (event) => {
+          mouseX = event.clientX - windowHalfX;
+          mouseY = event.clientY - windowHalfY;
+        });
+
+        function animate() {
+          requestAnimationFrame(animate);
+
+          targetX = mouseX * 0.001;
+          targetY = mouseY * 0.001;
+
+          particlesMesh.rotation.y += 0.001;
+          particlesMesh.rotation.x += 0.0005;
+
+          particlesMesh.rotation.y += 0.05 * (targetX - particlesMesh.rotation.y);
+          particlesMesh.rotation.x += 0.05 * (targetY - particlesMesh.rotation.x);
+
+          renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+      }
+    </script>
+  <script src="main-offline.js" type="module"></script></body>
+</html>
+
