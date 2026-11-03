@@ -1,0 +1,10 @@
+{
+  "name": "proin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ProIM (Intern Manager) Full-Stack Application",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {}
+}

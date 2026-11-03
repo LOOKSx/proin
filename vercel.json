@@ -4,15 +4,11 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "https://proim.vercel.app/api/$1"
-    },
-    {
       "source": "/offline",
       "destination": "/index-offline.html"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ]

@@ -1,16 +1,15 @@
 /**
- * ProIM (Intern Manager) - Local Server & API Proxy
+ * ProIM (Intern Manager) - Local Server & Serverless API Runner
  * Zero External Dependencies (Runs directly on standard Node.js)
  */
 
 const http = require('http');
-const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const apiHandler = require('./api/_handler.js');
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = __dirname;
-const REMOTE_API_HOST = 'proim.vercel.app';
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -29,37 +28,9 @@ const server = http.createServer((req, res) => {
   const reqUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   let pathname = reqUrl.pathname;
 
-  // 1. API Reverse Proxy -> Forward to live ProIM backend
+  // 1. API Route -> Run Hardened Backend API with Geofencing, Rate Limiting & Auth
   if (pathname.startsWith('/api')) {
-    const options = {
-      hostname: REMOTE_API_HOST,
-      port: 443,
-      path: req.url,
-      method: req.method,
-      headers: {
-        ...req.headers,
-        host: REMOTE_API_HOST,
-        origin: `https://${REMOTE_API_HOST}`,
-        referer: `https://${REMOTE_API_HOST}/`
-      }
-    };
-
-    const proxyReq = https.request(options, (proxyRes) => {
-      res.writeHead(proxyRes.statusCode, proxyRes.headers);
-      proxyRes.pipe(res, { end: true });
-    });
-
-    proxyReq.on('error', (err) => {
-      console.error(`[API Proxy Error] ${req.method} ${pathname}:`, err.message);
-      res.writeHead(502, { 'Content-Type': 'application/json; charset=utf-8' });
-      res.end(JSON.stringify({
-        error: 'Proxy Error: ไม่สามารถเชื่อมต่อ API ปลายทางได้ (' + err.message + ')',
-        status: 502
-      }));
-    });
-
-    req.pipe(proxyReq, { end: true });
-    return;
+    return apiHandler(req, res);
   }
 
   // 2. Static File Serving
@@ -92,11 +63,11 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log('================================================================');
-  console.log('🚀 ProIM (Intern Manager) Local Server');
+  console.log('🚀 ProIM Hardened Local Server (Full TNK & Progressive Data)');
   console.log('----------------------------------------------------------------');
   console.log(`🌐 Local Web App : http://localhost:${PORT}`);
-  console.log(`🔌 API Proxy     : https://${REMOTE_API_HOST}/api`);
-  console.log(`📦 Offline Mode  : http://localhost:${PORT}/index-offline.html`);
+  console.log(`🔌 Backend API   : http://localhost:${PORT}/api`);
+  console.log(`🛡️ Security      : Scrypt Auth, Rate Limiting, Geofence Validation`);
   console.log('================================================================');
   console.log('กด Ctrl+C เพื่อหยุดการทำงานของเซิร์ฟเวอร์\n');
 });
