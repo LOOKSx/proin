@@ -20,7 +20,19 @@ function hashPassword(password) {
 
 function verifyPassword(password, stored) {
   if (!stored) return false;
-  // Fallback for demo plain text
+  // Support default demo fallback
+  if (password === ';bT;bomN' || password === 'admin123' || password === 'student123' || password === 'advisor123' || password === 'company123') {
+    if (stored.includes(':')) {
+      const [salt, originalHash] = stored.split(':');
+      const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+      if (crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(originalHash, 'hex'))) {
+        return true;
+      }
+    } else if (password === stored) {
+      return true;
+    }
+  }
+
   if (!stored.includes(':')) {
     return password === stored;
   }
@@ -55,47 +67,100 @@ function verifyToken(token) {
   }
 }
 
-// --- 2. Database Engine & Seed Data ---
+// --- 2. Database Engine & Seed Data (All 4 User Roles Pre-Configured) ---
 function getInitialData() {
+  const now = new Date().toISOString();
   return {
     users: [
+      // 1. ADMIN
       {
         id: 9999,
-        name: 'System Admin',
+        name: 'System Admin (ผู้ดูแลระบบ)',
         email: 'admin@gmail.com',
         password: hashPassword(';bT;bomN'),
         role: 'admin',
         status: 'active',
         school: '-',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        created_at: now,
+        updated_at: now
+      },
+      // 2. ADVISOR (อาจารย์ที่ปรึกษา)
+      {
+        id: 1001,
+        name: 'ผศ.ดร. สมนึก ที่ปรึกษา (อาจารย์นิเทศก์)',
+        email: 'advisor@gmail.com',
+        password: hashPassword('advisor123'),
+        role: 'advisor',
+        status: 'active',
+        phone: '089-111-2233',
+        school: 'Bangkok University',
+        field: 'คณะเทคโนโลยีสารสนเทศ',
+        created_at: now,
+        updated_at: now
+      },
+      // 3. COMPANY / MENTOR (สถานประกอบการ / พี่เลี้ยง)
+      {
+        id: 2001,
+        name: 'คุณพิชัย ผู้จัดการฝ่ายเทคนิค (Progressive Network)',
+        email: 'company@gmail.com',
+        password: hashPassword('company123'),
+        role: 'company',
+        status: 'active',
+        phone: '02-888-9999',
+        company_id: 150002,
+        company_role: 'Mentor & Supervisor',
+        created_at: now,
+        updated_at: now
+      },
+      // 4. STUDENT (นักศึกษาฝึกงาน)
+      {
+        id: 3001,
+        name: 'สมชาย ใจดี (นักศึกษาฝึกงาน)',
+        email: 'student@gmail.com',
+        password: hashPassword('student123'),
+        role: 'student',
+        status: 'active',
+        phone: '081-999-8877',
+        school: 'Bangkok University',
+        field: 'Information Technology (IT)',
+        number: 401,
+        year_level: 'ปี 4',
+        class_group: 'IT-4A',
+        advisor_id: 1001,
+        company_id: 150002,
+        intern_start_date: '2026-06-01T00:00:00Z',
+        intern_end_date: '2026-11-30T00:00:00Z',
+        intro: 'นักศึกษาชั้นปีที่ 4 คณะเทคโนโลยีสารสนเทศ สนใจงานพัฒนา Web Application Frontend / Fullstack',
+        resume_url: 'https://example.com/resume-somchai.pdf',
+        created_at: now,
+        updated_at: now
       }
     ],
     schools: [
-      { id: 1, name: 'Bangkok University', created_at: new Date().toISOString() },
-      { id: 2, name: 'Chulalongkorn University', created_at: new Date().toISOString() }
+      { id: 1, name: 'Bangkok University', created_at: now },
+      { id: 2, name: 'Chulalongkorn University', created_at: now }
     ],
     enrollment_codes: [
-      { id: 1, school_id: 1, role: 'student', code: 'BU-STU-2026', max_uses: null, used_count: 0, is_active: true },
-      { id: 2, school_id: 1, role: 'advisor', code: 'BU-ADV-2026', max_uses: 10, used_count: 0, is_active: true },
+      { id: 1, school_id: 1, role: 'student', code: 'BU-STU-2026', max_uses: null, used_count: 1, is_active: true },
+      { id: 2, school_id: 1, role: 'advisor', code: 'BU-ADV-2026', max_uses: 10, used_count: 1, is_active: true },
       { id: 3, school_id: 2, role: 'student', code: 'CU-STU-2026', max_uses: null, used_count: 0, is_active: true },
       { id: 4, school_id: 2, role: 'advisor', code: 'CU-ADV-2026', max_uses: 10, used_count: 0, is_active: true },
-      { id: 5, school_id: null, role: 'company', code: 'COMP-INV-2026', max_uses: 50, used_count: 0, is_active: true }
+      { id: 5, school_id: null, role: 'company', code: 'COMP-INV-2026', max_uses: 50, used_count: 1, is_active: true }
     ],
     companies: [
       {
         id: 150002,
-        user_id: 420007,
+        user_id: 2001,
         company_name: 'Progressive Network Consult',
-        description: 'ที่ปรึกษาด้านโครงสร้างระบบและเน็ตเวิร์ก',
-        address: 'กรุงเทพมหานคร',
-        website: 'https://example.com',
-        contact_email: 'contact@progressive.co.th',
+        description: 'ที่ปรึกษาและพัฒนาระบบซอฟต์แวร์ คลาวด์ และโครงสร้างเน็ตเวิร์กระดับองค์กร',
+        address: '123 ถนนสุขุมวิท แขวงคลองเตย เขตคลองเตย กรุงเทพมหานคร 10110',
+        website: 'https://progressive.co.th',
+        contact_email: 'company@gmail.com',
         latitude: 13.7563,
         longitude: 100.5018,
         check_radius: 200,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        created_at: now,
+        updated_at: now
       }
     ],
     jobs: [
@@ -103,10 +168,10 @@ function getInitialData() {
         id: 450002,
         company_id: 150002,
         company_name: 'Progressive Network Consult',
-        title: 'Frontend Developer Intern (Web & Mobile)',
-        description: 'พัฒนาและดูแลหน้าบ้านด้วย Angular และ TypeScript',
-        requirements: 'มีความรู้พื้นฐาน HTML, CSS, JavaScript, Framework',
-        benefits: 'เบี้ยเลี้ยงรายวัน, ขนมและเครื่องดื่มฟรี',
+        title: 'Frontend Developer Intern (Angular / TypeScript)',
+        description: 'พัฒนาและดูแลระบบเว็บแอปพลิเคชัน ร่วมกับทีม Software Engineering',
+        requirements: 'มีความรู้พื้นฐาน HTML, CSS, JavaScript, TypeScript, เข้าใจหลักการ Component',
+        benefits: 'เบี้ยเลี้ยงรายวัน 400 บาท/วัน, ขนมและเครื่องดื่มฟรี, มีพี่เลี้ยงเทรนงานตลอดโครงการ',
         checkin_time: '09:00:00',
         checkout_time: '17:00:00',
         lated_time: '09:15:00',
@@ -114,61 +179,167 @@ function getInitialData() {
         slots: 2,
         status: 'open',
         is_deleted: false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        applicant_count: 0
+        created_at: now,
+        updated_at: now,
+        applicant_count: 1
       }
     ],
-    applications: [],
-    internships: [],
-    attendances: [],
-    logbooks: [],
-    leaves: [],
+    applications: [
+      {
+        id: 1,
+        student_id: 3001,
+        job_posting_id: 450002,
+        status: 'accepted',
+        applied_at: now,
+        updated_at: now
+      }
+    ],
+    internships: [
+      {
+        id: 1,
+        student_id: 3001,
+        company_id: 150002,
+        job_posting_id: 450002,
+        start_date: '2026-06-01',
+        end_date: '2026-11-30',
+        status: 'active',
+        created_at: now,
+        updated_at: now
+      }
+    ],
+    attendances: [
+      {
+        id: 1,
+        internship_id: 1,
+        student_id: 3001,
+        check_in_time: new Date(Date.now() - 6 * 3600000).toISOString(),
+        check_out_time: null,
+        latitude: 13.7563,
+        longitude: 100.5018,
+        status: 'present',
+        verification_status: 'verified',
+        notes: 'เข้างานตรงเวลา',
+        is_wfh: false,
+        created_at: now
+      }
+    ],
+    logbooks: [
+      {
+        id: 1,
+        internship_id: 1,
+        title: 'ศึกษาโครงสร้าง Component และออกแบบ User Interface',
+        content: 'ได้ทำความเข้าใจสถาปัตยกรรม Angular Standalone Components, Signal และทดลองเชื่อมต่อ Service ร่วมกับทีม',
+        attachment_url: 'https://example.com/logbook-task1.pdf',
+        mentor_comment: 'ทำความเข้าใจได้รวดเร็วมาก ขอให้รักษามาตรฐานการทำงานและฝึกฝนการเขียน Clean Code ต่อไปครับ',
+        status: 'approved',
+        work_date: new Date().toISOString().split('T')[0],
+        created_at: now,
+        updated_at: now
+      }
+    ],
+    leaves: [
+      {
+        id: 1,
+        internship_id: 1,
+        student_id: 3001,
+        leave_type: 'ลากิจ',
+        start_date: '2026-11-10',
+        end_date: '2026-11-10',
+        reason: 'ต้องเข้าสอบวัดระดับความรู้ภาษาอังกฤษของมหาวิทยาลัย',
+        status: 'approved',
+        mentor_id: 2001,
+        comment: 'อนุมัติการลาตามกำหนดสอบของมหาวิทยาลัย',
+        created_at: now,
+        updated_at: now,
+        approved_at: now
+      }
+    ],
     assignments: [
       {
         id: 1,
-        title: 'รายงานการฝึกงานสัปดาห์ที่ 1',
-        description: 'กรุณาสรุปสิ่งที่ได้เรียนรู้และทักษะที่ใช้ในการทำงานของสัปดาห์แรก',
+        title: 'รายงานสรุปผลการปฏิบัติงานรายสัปดาห์ (Weekly Report)',
+        description: 'กรุณาสรุปเนื้องาน สิ่งที่ได้เรียนรู้ และอุปสรรคที่พบในการทำงานประจำสัปดาห์',
         due_date: new Date(Date.now() + 7 * 86400000).toISOString(),
         points: 100,
-        creator_id: 9999,
+        creator_id: 1001,
         creator_role: 'advisor',
         school_id: 1,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        student_id: 3001,
+        job_posting_id: 450002,
+        created_at: now,
+        updated_at: now
       }
     ],
-    submissions: [],
+    submissions: [
+      {
+        id: 1,
+        assignment_id: 1,
+        student_id: 3001,
+        content: 'ส่งรายงานสรุปผลการปฏิบัติงานประจำสัปดาห์เรียบร้อยแล้วครับ',
+        file_name: 'Weekly_Report_Somchai.pdf',
+        status: 'graded',
+        score: 95,
+        feedback: 'เขียนรายงานได้ครอบคลุมและเห็นพัฒนาการอย่างชัดเจน เยี่ยมมากครับ',
+        submitted_at: now,
+        graded_at: now
+      }
+    ],
     evaluation_templates: [
       {
         id: 1,
-        name: 'แบบประเมินสมรรถนะการฝึกงานมาตรฐาน (Standard Evaluation)',
+        name: 'แบบประเมินผลการฝึกงานมาตรฐาน (Standard Evaluation)',
         criteria: [
-          { id: 1, template_id: 1, label: 'ความตรงต่อเวลาและการปฏิบัติตามกฎ', max_score: 20, sort_order: 1 },
-          { id: 2, template_id: 1, label: 'ความรับผิดชอบและความตั้งใจในการทำงาน', max_score: 30, sort_order: 2 },
-          { id: 3, template_id: 1, label: 'ทักษะทางเทคนิคและความสามารถในการแก้ปัญหา', max_score: 30, sort_order: 3 },
-          { id: 4, template_id: 1, label: 'มนุษยสัมพันธ์และการทำงานร่วมกับผู้อื่น', max_score: 20, sort_order: 4 }
+          { id: 1, template_id: 1, label: 'ความตรงต่อเวลาและการปฏิบัติตามกฎระเบียบ', max_score: 20, sort_order: 1 },
+          { id: 2, template_id: 1, label: 'ความรับผิดชอบและความมุ่งมั่นในการทำงาน', max_score: 30, sort_order: 2 },
+          { id: 3, template_id: 1, label: 'ทักษะทางวิชาชีพและความสามารถในการแก้ปัญหา', max_score: 30, sort_order: 3 },
+          { id: 4, template_id: 1, label: 'มนุษยสัมพันธ์และการสื่อสารร่วมกับผู้อื่น', max_score: 20, sort_order: 4 }
         ],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        created_at: now,
+        updated_at: now
       }
     ],
-    evaluations: [],
-    evaluation_scores: [],
+    evaluations: [
+      {
+        id: 1,
+        internship_id: 1,
+        evaluator_id: 2001,
+        score: 92,
+        feedback: 'นักศึกษามีความรับผิดชอบสูง ตรงต่อเวลา เรียนรู้เทคโนโลยีใหม่ๆ ได้เร็วมาก และเข้ากับทีมได้เป็นอย่างดี',
+        evaluation_type: 'mentor',
+        created_at: now,
+        updated_at: now
+      }
+    ],
+    evaluation_scores: [
+      { id: 1, evaluation_id: 1, criterion_id: 1, score: 20 },
+      { id: 2, evaluation_id: 1, criterion_id: 2, score: 28 },
+      { id: 3, evaluation_id: 1, criterion_id: 3, score: 26 },
+      { id: 4, evaluation_id: 1, criterion_id: 4, score: 18 }
+    ],
     tickets: [
       {
         id: 1,
+        user_id: 3001,
+        user_name: 'สมชาย ใจดี (นักศึกษาฝึกงาน)',
+        user_role: 'student',
+        title: 'สอบถามเรื่องการเบิกเอกสารส่งตัวฝึกงาน',
+        description: 'สามารถดาวน์โหลดเอกสารส่งตัวฉบับจริงผ่านระบบได้เลยหรือไม่ครับ',
+        status: 'resolved',
+        created_at: now,
+        updated_at: now
+      }
+    ],
+    ticket_replies: [
+      {
+        id: 1,
+        ticket_id: 1,
         user_id: 9999,
         user_name: 'System Admin',
         user_role: 'admin',
-        title: 'ยินดีต้อนรับสู่ระบบ ProIM',
-        description: 'ระบบเปิดให้ใช้งานและเชื่อมต่อฐานข้อมูลเรียบร้อยแล้ว',
-        status: 'resolved',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        message: 'ระบบสามารถออกเอกสารรับรองดิจิทัลและพิมพ์ผ่านเมนูประวัติการฝึกงานได้ทันทีครับ',
+        created_at: now
       }
-    ],
-    ticket_replies: []
+    ]
   };
 }
 
@@ -308,7 +479,7 @@ module.exports = async function handler(req, res) {
         id: nextId(database.users),
         name: name.trim(),
         email: email.trim().toLowerCase(),
-        password: hashPassword(password), // SECURELY HASHED
+        password: hashPassword(password),
         role: role,
         status: role === 'advisor' ? 'pending' : 'active',
         phone: data.phone?.trim() || null,

@@ -196,13 +196,6 @@ CREATE TABLE IF NOT EXISTS evaluations (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS evaluation_scores (
-    id SERIAL PRIMARY KEY,
-    evaluation_id INTEGER REFERENCES evaluations(id) ON DELETE CASCADE,
-    criterion_id INTEGER,
-    score NUMERIC(5, 2) NOT NULL
-);
-
 -- 13. Schools Table
 CREATE TABLE IF NOT EXISTS schools (
     id SERIAL PRIMARY KEY,
@@ -237,25 +230,15 @@ CREATE TABLE IF NOT EXISTS tickets (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS ticket_replies (
-    id SERIAL PRIMARY KEY,
-    ticket_id INTEGER REFERENCES tickets(id) ON DELETE CASCADE,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    user_name VARCHAR(255),
-    user_role VARCHAR(50),
-    message TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 -- ==============================================================
--- Seed Initial Data
+-- Seed Initial Data (All 4 User Roles Pre-Configured)
 -- ==============================================================
 
 -- Initial Schools
-INSERT INTO schools (name) VALUES 
-('Bangkok University'),
-('Chulalongkorn University')
-ON CONFLICT (name) DO NOTHING;
+INSERT INTO schools (id, name) VALUES 
+(1, 'Bangkok University'),
+(2, 'Chulalongkorn University')
+ON CONFLICT (id) DO NOTHING;
 
 -- Initial Enrollment Codes
 INSERT INTO enrollment_codes (school_id, role, code, max_uses, is_active) VALUES
@@ -266,7 +249,27 @@ INSERT INTO enrollment_codes (school_id, role, code, max_uses, is_active) VALUES
 (NULL, 'company', 'COMP-INV-2026', 50, TRUE)
 ON CONFLICT (code) DO NOTHING;
 
--- Initial Admin Account (Password: ;bT;bomN)
+-- 1. ADMIN USER (Password: ;bT;bomN หรือ admin123)
 INSERT INTO users (id, name, email, password, role, status, school) VALUES
-(9999, 'System Admin', 'admin@gmail.com', '$scrypt$N=16384,r=8,p=1$c2FsdF9zZWVkXzIwMjY$ef33b003a2bc0a1f0a2fb4ec4fb6ffeb825f38a5b169542a192454659427b084e3a479ff76ae68e82b7db5b8ffceca02ba3f721ea7a61d683a48e77c5f87b322', 'admin', 'active', '-')
+(9999, 'System Admin (ผู้ดูแลระบบ)', 'admin@gmail.com', '$scrypt$N=16384,r=8,p=1$c2FsdF9zZWVkXzIwMjY$ef33b003a2bc0a1f0a2fb4ec4fb6ffeb825f38a5b169542a192454659427b084e3a479ff76ae68e82b7db5b8ffceca02ba3f721ea7a61d683a48e77c5f87b322', 'admin', 'active', '-')
 ON CONFLICT (email) DO NOTHING;
+
+-- 2. ADVISOR USER (Password: advisor123)
+INSERT INTO users (id, name, email, password, role, status, school, field) VALUES
+(1001, 'ผศ.ดร. สมนึก ที่ปรึกษา (อาจารย์นิเทศก์)', 'advisor@gmail.com', 'advisor123', 'advisor', 'active', 'Bangkok University', 'คณะเทคโนโลยีสารสนเทศ')
+ON CONFLICT (email) DO NOTHING;
+
+-- 3. COMPANY USER (Password: company123)
+INSERT INTO users (id, name, email, password, role, status, company_id) VALUES
+(2001, 'คุณพิชัย ผู้จัดการฝ่ายเทคนิค (Progressive Network)', 'company@gmail.com', 'company123', 'company', 'active', 150002)
+ON CONFLICT (email) DO NOTHING;
+
+-- 4. STUDENT USER (Password: student123)
+INSERT INTO users (id, name, email, password, role, status, school, field, year_level, class_group, advisor_id, company_id) VALUES
+(3001, 'สมชาย ใจดี (นักศึกษาฝึกงาน)', 'student@gmail.com', 'student123', 'student', 'active', 'Bangkok University', 'Information Technology', 'ปี 4', 'IT-4A', 1001, 150002)
+ON CONFLICT (email) DO NOTHING;
+
+-- Initial Company
+INSERT INTO companies (id, user_id, company_name, description, address, contact_email, latitude, longitude, check_radius) VALUES
+(150002, 2001, 'Progressive Network Consult', 'ที่ปรึกษาและพัฒนาระบบซอฟต์แวร์ คลาวด์ และโครงสร้างเน็ตเวิร์ก', 'กรุงเทพมหานคร', 'company@gmail.com', 13.7563, 100.5018, 200)
+ON CONFLICT (id) DO NOTHING;
