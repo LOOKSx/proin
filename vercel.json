@@ -5,11 +5,11 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://proim.vercel.app/api/$1"
+      "destination": "/api/index.js"
     },
     {
-      "source": "/live",
-      "destination": "/index-live.html"
+      "source": "/offline",
+      "destination": "/index-offline.html"
     },
     {
       "source": "/(.*)",
